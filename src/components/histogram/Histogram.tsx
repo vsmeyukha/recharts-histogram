@@ -1,9 +1,17 @@
+import { ReactElement } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 import CustomBarShape from './CustomBar';
 import CustomTooltip from './CustomTooltip';
 
-const Histogram = ({data, period}) => {
+import { DataArray, Period } from '@/app/page';
+
+type HistogramProps = {
+  data: DataArray,
+  period: Period
+}
+
+const Histogram: React.FC<HistogramProps> = ({data, period}): ReactElement => {
   return (
     <ResponsiveContainer width="100%" height={400} className='bg-[#FF00F5] bg-opacity-5 rounded-[27px]'>
     <BarChart

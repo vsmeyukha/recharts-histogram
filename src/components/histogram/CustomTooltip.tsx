@@ -1,4 +1,11 @@
-const CustomTooltip = ({ active, payload }) => {
+import { DataArray } from "@/app/page";
+
+type CustomTooltipProps = {
+  active?: boolean,
+  payload?: DataArray
+}
+
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className='bg-[#65FF8E] h-[24px] w-[51px] rounded-[6px] flex justify-center items-center pointer-events-none'>

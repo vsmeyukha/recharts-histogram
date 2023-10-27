@@ -1,16 +1,59 @@
 'use client'
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ReactElement } from 'react';
 
 import Histogram from '@/components/histogram/Histogram';
 import Dropdown from '@/components/dropdown/Dropdown';
 
-type Period = 'year' | 'half_year' | 'month';
+export type Period = 'year' | 'half_year' | 'month';
+
+type GraphData = {
+  [key in Period]?: Record<string, number | null>;
+}
+
+type InitialData = [{
+  nickname: string,
+  finance?: {
+    total: {
+      sum: number,
+      donators_count: number,
+      regular_donators_count: number
+    },
+    periods?: [
+      {
+        "earnings": {
+          "year_sum": number,
+          "six_month_sum": number,
+          "last_month_sum": number
+        },
+        graph?: GraphData
+      }
+    ];
+  },
+  gift_settings: {
+    small_gift: string | null,
+    medium_gift: string | null,
+    big_gift: string | null
+  },
+  gift_stats: {
+    small_gift_count: number,
+    small_gift_sum: number,
+    small_medium_count: number,
+    small_medium_sum: number,
+    small_big_count: number,
+    small_big_sum: number
+  }
+}];
+
+type DataEntry = {
+  [key: string]: string | number | null;
+};
+
+export type DataArray = Array<DataEntry>;
 
 type DataState = {
-  year: any[];
-  half_year: any[];
-  month: any[];
+  year: DataArray;
+  half_year: DataArray;
+  month: DataArray;
 };
 
 async function getData() {
@@ -20,32 +63,44 @@ async function getData() {
     throw new Error('Failed to fetch data')
   }
  
-  const data = await response.json();
+  const data: InitialData = await response.json();
   return data;
 }
 
-const extractData = (data: any[], period: Period, tick: string = 'month') => {
-  if (!data || !data[0]?.finance?.periods[0]?.graph?.[period]) {
+const extractData = (data: InitialData, period: Period, tick: string = 'month'): DataArray => {
+  if (!data.length) {
     return [];
-  } else {
-    return Object.entries(data[0].finance.periods[0].graph[period]).map(([tickValue, value]) => ({ [tick]: tickValue, value }));
   }
+
+  const finance = data[0]?.finance;
+  const periods = finance?.periods;
+  const graphData = periods?.[0]?.graph?.[period];
+
+  if (!finance) {
+    return [];
+  }
+
+  if (!periods) {
+    return [];
+  }
+
+  if (!graphData) {
+    return [];
+  }
+
+  return Object.entries(graphData).map(([tickValue, value]) => ({ [tick]: tickValue, value }));
 };
 
-const Home = () => {
-  const [data, setData] = useState<DataState>({
-    year: [],
-    half_year: [],
-    month: []
-  });
+const Home: React.FC = (): ReactElement => {
+  const [data, setData] = useState<DataState | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const result = await getData();
-        const yearData = extractData(result, 'year');
-        const halfYearData = extractData(result, 'half_year');
-        const monthData = extractData(result, 'month', 'day');
+        const yearData: DataArray = extractData(result, 'year');
+        const halfYearData: DataArray = extractData(result, 'half_year');
+        const monthData: DataArray = extractData(result, 'month', 'day');
         setData({
           year: yearData,
           half_year: halfYearData,
@@ -59,9 +114,9 @@ const Home = () => {
     fetchData();
   }, []);
 
-  const [period, setPeriod] = useState('year');
+  const [period, setPeriod] = useState<Period>('year');
 
-  const currentData = data?.[period];
+  const currentData: DataArray = data?.[period] || [];
 
   return (
     <main className='h-screen bg-white flex flex-col justify-center items-center'>

@@ -1,13 +1,19 @@
 import { Rectangle } from "recharts";
 
-const CustomBarShape = (props) => {
-  const { fill, x, y, width, height } = props;
+type CustomBarShapeProps = {
+  x?: number,
+  y?: number,
+  width?: number,
+  height?: number
+}
+
+const CustomBarShape = (props: CustomBarShapeProps) => {
+  const { x, y, width, height } = props;
 
   return (
     <Rectangle
       {...props}
       className="hoverable-bar"
-      fill={fill}
       x={x}
       y={y}
       width={width}

@@ -1,7 +1,10 @@
+import { Dispatch, SetStateAction } from "react";
 import Image from "next/image";
 import { Menu, Transition } from "@headlessui/react";
 
 import Arrow from '../../../public/arrow.svg';
+
+import { Period } from "@/app/page";
 
 const periodLabels = {
   'year': 'За последний год',
@@ -9,7 +12,12 @@ const periodLabels = {
   'month': 'За последний месяц'
 };
 
-const Dropdown = ({ period, setPeriod }) => {
+type DropdownProps = {
+  period: Period,
+  setPeriod: Dispatch<SetStateAction<Period>>
+}
+
+const Dropdown = ({ period, setPeriod }: DropdownProps) => {
 
   return (
     <Menu>
@@ -91,7 +99,6 @@ const Dropdown = ({ period, setPeriod }) => {
               &&
               (<Menu.Item>
                 <button
-                  className={period === 'month' ? 'hidden' : ''}
                   onClick={() => setPeriod('month')}
                 >
                   За последний месяц
